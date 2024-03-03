@@ -4,7 +4,7 @@ This repository is meant for my thesis in marketing Management '24. In this repo
 
 In this repo you will find:
 
-1. Python files, consisting of a script for; video analysis functions, visualisation & regression  and video ingestion/frame looping.
+1. Python files, consisting of a script for; video analysis functions [functions.py], visualisation & regression  and video ingestion/frame looping.
 2. A file with downloaded mp.4 videos, which is a list of downloaded Youtube videos that will be ingested by the ingestion script for further analysis.
 3. Youtube data, which consists of dependent variables and control variables gathered with the Youtube API.
 4. Video data, consisting of the visual complexity and motion variety scores for each video.
