@@ -83,9 +83,7 @@ def calculate_asymmetry(frame):
 
     return asymmetry_mean
 
-def calculate_visual_variety(frame):
-    g_scale = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    normalized_frame = g_scale / 255.0
+
     
 
 
