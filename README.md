@@ -6,7 +6,16 @@ This repository is meant for my thesis in marketing Management '24. In this repo
 
 ## 1. Python files that are meant for video analysis, data visualization and main regression analysis
 
-[Video unctions.py](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Video_functions.py) is a file that consists of all feature complexity function definitions
+[Video functions.py](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Video_functions.py) is a file that consists of all feature complexity function definitions and asymmetry of object arrangement
+
+[Video_processing_main.py](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Video_processing_main.py) is a file that calls the `Video functions.py` file and loops through the 30 frames of the video.
+
+Object counting
+
+Irregularity of object arrangement
+
+Visual variety
+
 ## 2. A file with downloaded mp.4 videos, which is a list of downloaded YouTube videos that will be ingested by the ingestion script for further analysis.
 ## 3. Youtube data, which consists of dependent variables and control variables gathered with the Youtube API.
 ## 4. Video data, consisting of the visual complexity and motion variety scores for each video.
