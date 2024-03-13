@@ -18,7 +18,7 @@ def convert_and_normalise(frame):
     return normalised
 
 # Path to the video file
-video_path = 'First-Timer _ Apple Vision Pro.mp4'
+video_path = 'This is Off the Wall.mp4'
 
 # Create a VideoCapture object
 cap = cv.VideoCapture(video_path)
@@ -32,13 +32,13 @@ if not cap.isOpened():
 total_frames = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
 
 # Calculate interval to sample 30 frames evenly throughout the video
-interval = total_frames // 30
+interval = total_frames // 10
 
 # Initialize lists to store the scores
 distances = []
 norm_old_frame = None
 # Loop over 30 frames
-for i in range(30):
+for i in range(10):
     # The frame position to read
     frame_pos = i * interval
     
