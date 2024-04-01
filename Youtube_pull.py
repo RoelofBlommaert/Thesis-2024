@@ -26,14 +26,14 @@ video_id_chunks = list(chunk_list(video_ids, chunk_size))
 all_responses = []
 
 # Make API requests for each chunk of video IDs
-for chunk in video_id_chunks:
-    video_ids_string = ",".join(chunk)
-    request = youtube.videos().list(
-        part='snippet,contentDetails,statistics',
-        id=video_ids_string
-    )
-    response = request.execute()
-    all_responses.append(response)
+# for chunk in video_id_chunks:
+#     video_ids_string = ",".join(chunk)
+#     request = youtube.videos().list(
+#         part='snippet,contentDetails,statistics',
+#         id=video_ids_string
+#     )
+#     response = request.execute()
+#     all_responses.append(response)
 
 
 flattened_data = []
