@@ -16,16 +16,17 @@ This repository is meant for my thesis in marketing Management '24. In this repo
 
 [Visual_variety.py](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Visual_variety.py) is a file that calls the `Visual_variety.py.py` file, individually loops through the videos and saves the score for irregularity of object arrangement.
 
-## 2. A .xlsx file with all video links of original YouTube video links called [Video_links.xlsx](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Video_links.xlsx).
-This file also includes YouTube channel name and brand name. These videos have been manually checked to be original uploads form the official brand channel. 
+## 2. API interaction script for data gathering
+[Youtube_pull.py](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Youtube_pull.py) which is the ingestion script for video links and calls the API. It creates the YouTube data file with Independent, dependent and control variables from the YouTube API.
 
-## 3. A folder with downloaded mp.4 videos, which is a list of downloaded YouTube videos that will be ingested by the `video_processing_main.py`, `Detectron object counting.py`, `Visual_variety.py.py` and `Irregularity.py` scripts for further analysis.
+## 3. Data files
+[Video_links.xlsx](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Video_links.xlsx) contains video links gathered from https://www.superbowl-ads.com/ for the years 2020 - 2024, with the Youtube Channel name and Brand name included. These links have been manually checked to be original uploads.
 
-## 4. [Youtube_pull.py](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Youtube_pull.py) which is the ingestion script for video links and calls the API. It creates the YouTube data file with Independent, dependent and control variables from the YouTube API.
+A folder with downloaded mp.4 videos, which is a list of downloaded YouTube videos that will be ingested by the `video_processing_main.py`, `Detectron object counting.py`, `Visual_variety.py.py` and `Irregularity.py` scripts for further analysis.
 
-## 5. [Superbowl_data_2024.csv](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Superbowl_data_2024.csv) which contains the raw Youtube data, which consists of dependent variables and control variables gathered with the Youtube API.
+[Superbowl_data_2024.csv](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Superbowl_data_2024.csv) contains the results of pulling the data from Youtube using the API. This file contains both the dependent variables, as well as some control variables.
 
-## 6. Video data, consisting of the measures for visual complexity and visual variety scores for each video.
+[Name] consists of the visual video data variables per video, with the title of the video included.
 
-## 7. A total feature matrix file, which has all Youtube and Video data in a combined file for regression analysis.
+[Final Feature Matrix] is a feature matrix file with all variables from the Youtube API, as well as the calculated visual variables. This is the result of combining `Superbowl_data_2024.cs` and `[Name] files on video title.
 
