@@ -65,4 +65,6 @@ df = pd.DataFrame(flattened_data)
 # Display the DataFrame
 print(df)
 
-df.to_csv('Superbowl_data_2024.csv', index=False)
+df.to_csv('Superbowl_video_data.csv', index=False)
+
+
