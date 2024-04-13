@@ -54,7 +54,7 @@ for response in all_responses:
             'viewCount': item['statistics']['viewCount'],
             'likeCount': item['statistics'].get('likeCount', None,), # Set to None if not present
             'commentCount': item['statistics'].get('commentCount', None,), # Set to None if not present
-            'status': item['status']['uploadStatus']
+            'status': item['status']['privacyStatus']
         }
         # Append the flattened dictionary to the list
         flattened_data.append(flattened_item)
@@ -65,4 +65,4 @@ df = pd.DataFrame(flattened_data)
 # Display the DataFrame
 print(df)
 
-#df.to_csv('Superbowl_data_2024.csv', index=False)
+df.to_csv('Superbowl_data_2024.csv', index=False)
