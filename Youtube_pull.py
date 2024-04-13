@@ -26,14 +26,14 @@ video_id_chunks = list(chunk_list(video_ids, chunk_size))
 all_responses = []
 
 # Make API requests for each chunk of video IDs
-# for chunk in video_id_chunks:
-#     video_ids_string = ",".join(chunk)
-#     request = youtube.videos().list(
-#         part='snippet,contentDetails,statistics',
-#         id=video_ids_string
-#     )
-#     response = request.execute()
-#     all_responses.append(response)
+for chunk in video_id_chunks:
+    video_ids_string = ",".join(chunk)
+    request = youtube.videos().list(
+        part='snippet,contentDetails,statistics,status',
+        id=video_ids_string
+    )
+    response = request.execute()
+    all_responses.append(response)
 
 
 flattened_data = []
@@ -50,12 +50,11 @@ for response in all_responses:
             'channelId': item['snippet']['channelId'],
             'title': item['snippet']['title'],
             'channelTitle': item['snippet']['channelTitle'],
-            'tags': item['snippet'].get('tags', []),
-            'categoryId': item['snippet']['categoryId'],
             'duration': item['contentDetails']['duration'],
             'viewCount': item['statistics']['viewCount'],
-            'likeCount': item['statistics']['likeCount'],
-            'commentCount': item['statistics'].get('commentCount', None)  # Set to None if not present
+            'likeCount': item['statistics'].get('likeCount', None,), # Set to None if not present
+            'commentCount': item['statistics'].get('commentCount', None,), # Set to None if not present
+            'status': item['status']['uploadStatus']
         }
         # Append the flattened dictionary to the list
         flattened_data.append(flattened_item)
