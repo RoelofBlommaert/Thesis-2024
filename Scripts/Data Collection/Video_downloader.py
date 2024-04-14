@@ -42,14 +42,14 @@ print("All downloads completed.")
 
 #Check what files are not downloaded due to an error or other YouTube restrictions
 folder_path = 'Data/downloaded_videos'
-file_names = os.listdir(folder_path)
-titles = []
+file_ids = os.listdir(folder_path)
+ids = []
 #Remove the .mp4 from the file name
-for file in file_names:
-    name = file[:-4]
-    titles.append(name)
+for id in file_ids:
+    name = id[:-4]
+    ids.append(name)
 
-for title in list(df['title']):
-    if title not in titles:
-        print(title)
+for identifier in list(df['id']):
+    if identifier not in ids:
+        print(identifier)
     
