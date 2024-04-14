@@ -8,15 +8,14 @@ def chunk_list(lst, chunk_size):
         yield lst[i:i + chunk_size]
 
 # Read the Excel file to extract video IDs
-file_path = '../../Data/video_links.xlsx'
+file_path = 'Data/video_links.xlsx'
 df = pd.read_excel(file_path)
-print("Current Working Directory:", os.getcwd())
 
 # Extract video IDs from the DataFrame
 video_ids = [url.split('?v=')[1][0:11] for url in df['Link']]
 
 # Set up the YouTube Data API
-api_key = os.getenv("MY_SECRET_KEY")
+api_key = os.getenv("MY_SECRET_KEY") #Get Google api key from 'https://console.cloud.google.com/' and set as env variable
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 # Chunk the list of video IDs into smaller lists
@@ -66,6 +65,6 @@ df = pd.DataFrame(flattened_data)
 # Display the DataFrame
 print(df)
 
-df.to_csv('Superbowl_video_data.csv', index=False)
+df.to_csv('Data/youtube_videos_raw.csv', index=False)
 
 
