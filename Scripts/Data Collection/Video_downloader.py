@@ -17,8 +17,6 @@ for id in video_ids:
 
 # Directory to save the downloaded videos
 save_path = 'Data/downloaded_videos'
-
-# Ensure the directory exists
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 
@@ -30,8 +28,10 @@ for url in video_urls:
         stream = yt.streams.filter(progressive=True, file_extension='mp4', res='720p').first()
         if stream:
             # Download the video and save it with the title of the video
-            stream.download(output_path=save_path, filename=f"{yt.title}.mp4")
-            print(f"Downloaded: {yt.title}")
+            video_id = yt.video_id
+            filename = f"{video_id}.mp4"  # Create filename using the video ID
+            stream.download(output_path=save_path, filename=filename)
+            print(f"Downloaded: {yt.title} as {filename}")
         else:
             print(f"No suitable stream found for {url}")
     except Exception as e:
