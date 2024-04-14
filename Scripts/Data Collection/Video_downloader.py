@@ -49,11 +49,7 @@ for file in file_names:
     name = file[:-4]
     titles.append(name)
 
-#Return videos that have to be manually downloaded
 for title in list(df['title']):
     if title not in titles:
         print(title)
     
-
-
-
