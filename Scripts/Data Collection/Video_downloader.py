@@ -1,9 +1,10 @@
 import os
 from pytube import YouTube
 
+
 # List of YouTube video URLs
 video_urls = [
-    #enter videos from video_links.xlsx
+    
 ]
 
 # Directory to save the downloaded videos
