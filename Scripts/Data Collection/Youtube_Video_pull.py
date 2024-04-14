@@ -8,8 +8,9 @@ def chunk_list(lst, chunk_size):
         yield lst[i:i + chunk_size]
 
 # Read the Excel file to extract video IDs
-file_path = 'Video_links.xlsx'
+file_path = '../../Data/video_links.xlsx'
 df = pd.read_excel(file_path)
+print("Current Working Directory:", os.getcwd())
 
 # Extract video IDs from the DataFrame
 video_ids = [url.split('?v=')[1][0:11] for url in df['Link']]
