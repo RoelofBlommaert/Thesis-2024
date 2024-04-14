@@ -1,14 +1,22 @@
 import os
+import pandas as pd
 from pytube import YouTube
 
+path = 'Data/youtube_cleaned.csv'
+df = pd.read_csv(path)
+print(df)
 
-# List of YouTube video URLs
-video_urls = [
-    
-]
+# List of YouTube video IDs
+video_ids = list(df['id'])
+
+#With the IDs, we will create some video urls
+video_urls = []
+for id in video_ids:
+    video_url = 'https://www.youtube.com/watch?v=' + id
+    video_urls.append(video_url)
 
 # Directory to save the downloaded videos
-save_path = 'downloaded_videos'
+save_path = 'Data/downloaded_videos'
 
 # Ensure the directory exists
 if not os.path.exists(save_path):
@@ -19,7 +27,7 @@ for url in video_urls:
     try:
         yt = YouTube(url)
         # Select the highest resolution stream available
-        stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+        stream = yt.streams.filter(progressive=True, file_extension='mp4', res='720p').first()
         if stream:
             # Download the video and save it with the title of the video
             stream.download(output_path=save_path, filename=f"{yt.title}.mp4")
@@ -30,3 +38,22 @@ for url in video_urls:
         print(f"Failed to download {url}: {str(e)}")
 
 print("All downloads completed.")
+
+
+#Check what files are not downloaded due to an error or other YouTube restrictions
+folder_path = 'Data/downloaded_videos'
+file_names = os.listdir(folder_path)
+titles = []
+#Remove the .mp4 from the file name
+for file in file_names:
+    name = file[:-4]
+    titles.append(name)
+
+#Return videos that have to be manually downloaded
+for title in list(df['title']):
+    if title not in titles:
+        print(title)
+    
+
+
+
