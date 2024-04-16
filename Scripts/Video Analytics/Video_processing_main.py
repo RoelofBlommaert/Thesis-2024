@@ -11,7 +11,7 @@ import Video_functions
 #      for an Interactive Shell leading to functions being distorted when read by the interpreter          
 
 # Path to the video file
-video_path = 'First-Timer _ Apple Vision Pro.mp4'
+video_path = 'This is Off the Wall.mp4'
 
 # Create a VideoCapture object
 cap = cv.VideoCapture(video_path)
