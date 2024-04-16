@@ -1,4 +1,4 @@
-Hi there!
+Hi there! 😄
 
 This research leverages computer vision and object detection to measure the effect of low-level visual features in advertising videos on online engagement metrics. 
 
