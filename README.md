@@ -13,7 +13,8 @@ The folders have the following contents
 # 1. Scripts
 
 ## a. Data collections
-1. [Youtube_pull.py](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Youtube_pull.py) which is the ingestion script for video links and calls the API. It creates the YouTube data file with Independent, dependent and control variables from the YouTube API.
+1. [Youtube_Video_pull.py]((https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Scripts/Data%20Collection/Youtube_Video_pull.py)) which is the ingestion script for video links and calls the API. It creates the YouTube data file with Independent, dependent and control variables from the YouTube API.
+2. [YouTube_channel_pull.py](
 
 ## b. Video analytics
 1. [Video functions.py](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Video_functions.py) is a file that consists of all feature complexity function definitions and asymmetry of object arrangement.
