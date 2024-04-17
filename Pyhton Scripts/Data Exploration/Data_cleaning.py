@@ -56,15 +56,6 @@ df_cleaned['Length'] = df_cleaned['duration'].apply(iso8601_duration_to_seconds)
 print(df_cleaned)
 
 
-#Clean titles from non ASCII chars
-def sanitize_title(title):
-    # Replace disallowed characters with an underscore or remove them
-    sanitized = title.replace('|', '').replace(':', '').replace('"', '').replace('?', '')
-    sanitized = sanitized.replace('/', '').replace('\\', '').replace('*', '')
-    return sanitized
-df_cleaned['clean_title'] = df['title'].apply(sanitize_title)
-
-
 #Load cleaned data file
 cleaned_file_path = 'Data/youtube_cleaned.csv'
 df_cleaned.to_csv(cleaned_file_path, index = False)

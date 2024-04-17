@@ -26,7 +26,7 @@ def detect_and_return_unique_objects(frame):
     unique_labels = {label for label, score in zip(labels, scores) if score > 0.5}
     return unique_labels
 
-video_path = "First-Timer _ Apple Vision Pro.mp4"
+video_path = 'This is Off the Wall.mp4'
 
 # Initialize a set to store cumulative unique objects detected across frames
 cum_unique_objects = set()
