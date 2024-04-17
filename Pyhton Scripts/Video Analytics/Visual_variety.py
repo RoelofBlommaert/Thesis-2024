@@ -1,6 +1,8 @@
 import cv2 as cv
 import numpy as np
 import pandas as pd
+import os
+
 #Since the calculation of visual variety demands a different manner of looping and comparing frames, instead of measuring
 #independent scores based on one frame at a time, the visual variety calculations are seperate from the functions and main script
 
@@ -17,45 +19,56 @@ def convert_and_normalise(frame):
     normalised = (g_scale - x_min) / (x_max - x_min) if x_max - x_min > 0 else np.zeros(g_scale.shape)
     return normalised
 
-# Path to the video file
-video_path = 'This is Off the Wall.mp4'
-
-# Create a VideoCapture object
-cap = cv.VideoCapture(video_path)
-
-# Check if video opened successfully
-if not cap.isOpened():
-    print("Error: Could not open video.")
-    exit()
-
-# Get total number of video frames
-total_frames = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
-
-# Calculate interval to sample 30 frames evenly throughout the video
-interval = total_frames // 10
-
-# Initialize lists to store the scores
-distances = []
-norm_old_frame = None
-# Loop over 30 frames
-for i in range(10):
-    # The frame position to read
-    frame_pos = i * interval
+def calculate_visual_variety(video_path):
+    cap = cv.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Error: Could not open video {video_path}.")
+        return None
     
-    # Set the current frame position of the video file
-    cap.set(cv.CAP_PROP_POS_FRAMES, frame_pos)
+    total_frames = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
+    interval = total_frames // 10
+    distances = []
+    norm_old_frame = None
     
-    # Read the frame
-    ret, frame = cap.read()
-    # If frame is read correctly ret is True
-    if not ret:
-        print("Failed to grab frame.")
-        continue  # Skip this frame and continue with the next
-    norm_frame = convert_and_normalise(frame)
-    if norm_old_frame is not None:
-        distance = np.sum(np.abs(norm_frame - norm_old_frame)) / norm_frame.size
-        distances.append(distance)
-    norm_old_frame = norm_frame
+    for i in range(10):
+        frame_pos = i * interval
+        cap.set(cv.CAP_PROP_POS_FRAMES, frame_pos)
+        ret, frame = cap.read()
+        if not ret:
+            continue
+        norm_frame = convert_and_normalise(frame)
+        if norm_old_frame is not None:
+            distance = np.sum(np.abs(norm_frame - norm_old_frame)) / norm_frame.size
+            distances.append(distance)
+        norm_old_frame = norm_frame
+    
+    cap.release()
+    return np.mean(distances) if distances else 0
 
-visual_variety_score = np.mean(distances)
-print("Visual Variety Score:", visual_variety_score)
+# Directory containing video files
+video_dir = 'Data/downloaded_videos'
+video_files = [os.path.join(video_dir, f) for f in os.listdir(video_dir) if f.endswith('.mp4')]
+
+# Dictionary to store video names and their visual variety scores
+visual_variety_scores = {}
+
+# Calculate visual variety scores for each video
+for video_path in video_files:
+    video_name = os.path.basename(video_path)
+    score = calculate_visual_variety(video_path)
+    if score is not None:
+        visual_variety_scores[video_name] = score
+        print(f"Visual Variety Score for {video_name}: {score}")
+
+print(visual_variety_scores)
+# Read existing CSV file with visual complexity scores
+df_complexity = pd.read_csv('Data/video_analysis_complexity_results.csv')
+
+# Convert the visual variety dictionary to a DataFrame
+df_variety = pd.DataFrame(list(visual_variety_scores.items()), columns=['Video Name', 'Visual Variety'])
+df_variety['Video Name'] = df_variety['Video Name'].str.replace('.mp4', '', regex=False)
+# Merge the DataFrames on video name
+merged_df = df_complexity.merge(df_variety, on='Video Name', how='outer')
+
+# # Save the updated DataFrame to CSV
+merged_df.to_csv('complexity_and_variety_scores.csv', index=False)
