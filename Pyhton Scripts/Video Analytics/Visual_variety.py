@@ -71,4 +71,5 @@ df_variety['Video Name'] = df_variety['Video Name'].str.replace('.mp4', '', rege
 merged_df = df_complexity.merge(df_variety, on='Video Name', how='outer')
 
 # # Save the updated DataFrame to CSV
-merged_df.to_csv('complexity_and_variety_scores.csv', index=False)
+merged_file_path = 'Data/complexity_and_variety_scores.csv'
+merged_df.to_csv(merged_file_path, index=False)
