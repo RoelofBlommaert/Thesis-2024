@@ -8,6 +8,9 @@ from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
+import os
+import numpy as np
+import pandas as pd
 
 # Setup detectron2 logger and configuration
 cfg = get_cfg()
@@ -24,43 +27,47 @@ def detect_and_return_unique_objects(frame):
     scores = instances.scores
     labels = [MetadataCatalog.get(cfg.DATASETS.TRAIN[0]).thing_classes[i] for i in classes]
     unique_labels = {label for label, score in zip(labels, scores) if score > 0.5}
-    return unique_labels
+    return len(unique_labels)
 
-video_path = 'This is Off the Wall.mp4'
-
-# Initialize a set to store cumulative unique objects detected across frames
-cum_unique_objects = set()
-
-# Open the video
-cap = cv.VideoCapture(video_path)
-if not cap.isOpened():
-    print("Error: Could not open video.")
-    exit()
-# Calculate the interval for sampling 30 frames
-total_frames = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
-interval = max(1, total_frames // 30)  # Avoid division by zero
-
-# Process 30 frames evenly distributed throughout the video
-for i in range(30):
-    # Set the frame position
-    frame_id = i * interval
-    cap.set(cv.CAP_PROP_POS_FRAMES, frame_id)
+def calculate_unique_objects(video_path):
+    cap = cv.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Error: Could not open video {video_path}.")
+        return None
     
-    # Read the frame
-    ret, frame = cap.read()
-    if not ret:
-        break  # No more frames to process or unable to read the frame
+    total_frames = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
+    interval = total_frames // 30  # Process 30 frames evenly distributed throughout the video
+    cum_unique_objects = 0
+    
+    for i in range(30):
+        frame_pos = i * interval
+        cap.set(cv.CAP_PROP_POS_FRAMES, frame_pos)
+        ret, frame = cap.read()
+        if not ret:
+            continue
+        unique_objects = detect_and_return_unique_objects(frame)
+        cum_unique_objects += unique_objects
+    
+    cap.release()
+    return cum_unique_objects
 
-    # Detect and return unique labels for the current frame
-    frame_unique_labels = detect_and_return_unique_objects(frame)
-    # Update the cumulative set of unique objects
-    cum_unique_objects.update(frame_unique_labels)
+# Directory containing video files
+video_dir = 'Data/downloaded_videos'
+video_files = [os.path.join(video_dir, f) for f in os.listdir(video_dir) if f.endswith('.mp4')]
 
-# Release the video capture object
-cap.release()
+# Dictionary to store video names and their sum of unique objects over 30 frames
+unique_objects_counts = {}
 
-# Print the cumulative unique objects detected
-print("Unique objects detected across sampled frames:")
-print(cum_unique_objects)
-print("Count of unique objects detected across samples frames:")
-print(len(cum_unique_objects))
+# Calculate unique objects for each video
+for video_path in video_files:
+    video_name = os.path.basename(video_path)
+    count = calculate_unique_objects(video_path)
+    if count is not None:
+        unique_objects_counts[video_name] = count
+        print(f"Unique objects count for {video_name}: {count}")
+
+# Convert the unique objects dictionary to a DataFrame
+df_unique_objects = pd.DataFrame(list(unique_objects_counts.items()), columns=['Video Name', 'Unique Objects Count'])
+
+# Save the DataFrame to CSV
+df_unique_objects.to_csv('Data/unique_objects_counts.csv', index=False)
