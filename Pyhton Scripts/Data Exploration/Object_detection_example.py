@@ -17,7 +17,7 @@ cfg.MODEL.DEVICE = 'cpu'  # Run on CPU
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 predictor = DefaultPredictor(cfg)
 
-video_path = 'Data/downloaded_videos/yfLz54hzpPs.mp4'
+video_path = 'Data/downloaded_videos/BBIX9FG6kZ0.mp4'
 
 # Open the video
 cap = cv.VideoCapture(video_path)

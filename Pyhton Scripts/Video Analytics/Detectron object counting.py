@@ -69,7 +69,7 @@ for video_path in video_files:
 # Convert the unique objects dictionary to a DataFrame
 df_unique_objects = pd.DataFrame(list(unique_objects_counts.items()), columns=['Video Name', 'Unique Objects Count'])
 df_unique_objects['Video Name'] = df_unique_objects['Video Name'].str.replace('.mp4', '', regex=False)
-
+df_unique_objects['Unique Objects Count'] = df_unique_objects['Unique Objects Count']/30
 df_complexity_variety = pd.read_csv('Data/complexity_and_variety_scores.csv')
 
 # Merge the DataFrames on video name
@@ -81,3 +81,5 @@ merged_df.to_csv(merged_file_path, index=False)
 
 # Save the DataFrame to CSV
 df_unique_objects.to_csv('Data/unique_objects_counts.csv', index=False)
+
+
