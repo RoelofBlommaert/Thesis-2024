@@ -37,12 +37,17 @@ average_metrics_per_year = df_cleaned.groupby('year').agg({
 # Print the average views, likes, and comments per year
 print(average_metrics_per_year)
 
-#Recode publishedAt to be days from now (14th of April 2024)
-current_date = pd.to_datetime('today').tz_localize(None)
+# Convert 'publishedAt' column to datetime format
+df_cleaned['publishedAt'] = pd.to_datetime(df_cleaned['publishedAt'])
+
+# Make current date timezone-aware to match the timezone of 'publishedAt' column
+current_date = datetime.now(df_cleaned['publishedAt'].dt.tz)
+
 # Calculate the difference in days
-df_cleaned['publishedAt'] = df_cleaned['publishedAt'].dt.tz_localize(None)
-df_cleaned['days_since_published'] = (current_date - df_cleaned['publishedAt']).dt.days
-print(df_cleaned)
+df_cleaned['Time'] = (current_date - df_cleaned['publishedAt']).dt.days
+
+# Print the DataFrame with the new 'Time' variable
+print(df_cleaned[['publishedAt', 'Time']])
 
 #Recode duration to be seconds, by recoding ISO8601 strings to seconds
 def iso8601_duration_to_seconds(iso_duration):

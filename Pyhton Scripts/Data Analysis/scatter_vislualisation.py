@@ -10,6 +10,8 @@ final_path = 'Data/Final_feature_matrix.csv'
 visual = pd.read_csv(visual_path)
 youtube = pd.read_csv(youtube_path)
 merged = visual.merge(youtube, left_on='Video Name', right_on='id', how='outer')
+
+merged.to_csv('Data/feature_matrix.csv', index=False)
 # Define the independent and dependent variables
 iv_columns = ['Color Complexity', 'Edge Density', 'Luminance Complexity']
 dv_columns = ['likeCount']  # Replace with actual DV column names
