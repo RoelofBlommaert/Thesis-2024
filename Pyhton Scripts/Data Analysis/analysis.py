@@ -18,11 +18,12 @@ data['squared Asymmetry of Object Arrangement'] = data['Asymmetry of Object Arra
 data['squared Irregularity of Object Arrangement'] = data['Irregularity of Object Arrangement']**2
 data['squared Visual Variety'] = data['Visual Variety']**2
 data['squared Unique Objects Count'] = data['Unique Objects Count']**2
+data['logSubscribers'] = np.log(data['subscriberCount'])
 print(data)
 
 
 X = data[['Luminance Complexity', 'Color Complexity', 'Edge Density', 'Asymmetry of Object Arrangement', 'Irregularity of Object Arrangement', 'Unique Objects Count',
-           'Visual Variety']]  
+           'Visual Variety', 'logSubscribers', 'Time', 'Length']]  
 X = add_constant(X)  # add a constant term for the intercept
 
 # Calculate VIF for each explanatory variable
