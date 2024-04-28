@@ -57,10 +57,10 @@ model_data.columns = [col.replace(' ', '_') for col in model_data.columns]
 print(model_data)
 
 #Make formulas for regression
-lin_views_formula = '''Views ~ Color_Complexity + Edge_Density + Luminance_Complexity + Asymmetry_of_Object_Arrangement + 
+lin_views_formula = '''Views ~ Color_Complexity + Edge_Density + Luminance_Complexity + 
 Irregularity_of_Object_Arrangement + Unique_Objects_Count + Visual_Variety + logSubscribers + Time + Length + status'''
 
-quad_views_formula = '''Views ~ squared_Color_Complexity + squared_Edge_Density + squared_Luminance_Complexity + squared_Asymmetry_of_Object_Arrangement + 
+quad_views_formula = '''Views ~ squared_Color_Complexity + squared_Edge_Density + squared_Luminance_Complexity + 
 squared_Irregularity_of_Object_Arrangement + squared_Unique_Objects_Count + squared_Visual_Variety + logSubscribers + Time + Length + status'''
 
 lin_likes_formula = '''Likes ~ Color_Complexity + Edge_Density + Luminance_Complexity + Asymmetry_of_Object_Arrangement + 
@@ -75,9 +75,36 @@ Irregularity_of_Object_Arrangement + Unique_Objects_Count + Visual_Variety + log
 quad_comment_formula = '''Comments ~ squared_Color_Complexity + squared_Edge_Density + squared_Luminance_Complexity + squared_Asymmetry_of_Object_Arrangement + 
 squared_Irregularity_of_Object_Arrangement + squared_Unique_Objects_Count + squared_Visual_Variety + logSubscribers + Time + Length + status'''
 
-# Fitting a Negative Binomial Model
-model = glm(formula=lin_views_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
-print(model.summary())
+# Fitting a Poisson & Negative Binomial Model 
+
+po_lin_view_model = glm(formula=lin_views_formula, data=model_data, family=sm.families.Poisson()).fit()
+print(po_lin_view_model.summary())
+nb_lin_view_model = glm(formula=lin_views_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
+print(nb_lin_view_model.summary())
+
+print(f"Poisson AIC: {po_lin_view_model.aic}")
+print(f"Negative Binomial AIC: {nb_lin_view_model.aic}")
+
+nb_quad_view_model = glm(formula=quad_views_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
+print(nb_quad_view_model.summary())
+
+nb_lin_like_model = glm(formula=lin_likes_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
+print(nb_lin_like_model.summary())
+
+nb_quad_like_model = glm(formula=quad_likes_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
+print(nb_quad_like_model.summary())
+
+nb_lin_comment_model = glm(formula=lin_comment_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
+print(nb_lin_comment_model.summary())
+
+po_lin_comment_model = glm(formula=lin_comment_formula, data=model_data, family=sm.families.Poisson()).fit()
+print(po_lin_view_model.summary())
+
+print(f"Poisson AIC: {po_lin_comment_model.aic}")
+print(f"Negative Binomial AIC: {nb_lin_comment_model.aic}")
+
+nb_quad_comment_model = glm(formula=quad_comment_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
+print(nb_quad_comment_model.summary())
 
 # Residuals plot
 residuals = model.resid_response
@@ -89,18 +116,3 @@ plt.show()
 sns.scatterplot(x=np.arange(len(residuals)), y=residuals)
 plt.title('Residuals Distribution')
 plt.show()
-
-model = glm(formula=quad_views_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
-print(model.summary())
-
-model = glm(formula=lin_likes_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
-print(model.summary())
-
-model = glm(formula=quad_likes_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
-print(model.summary())
-
-model = glm(formula=lin_comment_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
-print(model.summary())
-
-model = glm(formula=quad_comment_formula, data=model_data, family=sm.families.NegativeBinomial()).fit()
-print(model.summary())
