@@ -40,7 +40,7 @@ Y = add_constant(Y)  # add a constant term for the intercept
 # Calculate VIF for each explanatory variable
 vif = pd.DataFrame()
 vif["variables"] = Y.columns
-vif["VIF"] = [variance_inflation_factor(Y.values, i) for i in range(X.shape[1])]
+vif["VIF"] = [variance_inflation_factor(Y.values, i) for i in range(Y.shape[1])]
 print(vif)
 
 #Make subset of data
