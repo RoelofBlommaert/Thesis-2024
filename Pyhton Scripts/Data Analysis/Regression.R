@@ -36,7 +36,7 @@ print(head(model_data))
 lin_views_formula <- 'Views ~ Color.Complexity + Edge.Density + Luminance.Complexity + Asymmetry.of.Object.Arrangement +
 Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
 
-quad_views_formula <- 'Views ~ squared_Color_Complexity + squared_Edge_Density + squared_Luminance_Complexity +
+quad_views_formula <- 'Views ~ squared_Color_Complexity + squared_Edge_Density + squared_Luminance_Complexity + squared_Asymmetry_of_OA +
 squared_Irregularity_of_OA + squared_Unique_Objects_Count + squared_Visual_Variety + logSubscribers + Time + Length + status'
 
 lin_likes_formula <- 'Likes ~ Color.Complexity + Edge.Density + Luminance.Complexity + 
