@@ -78,13 +78,13 @@ norm_data <- data %>%
     Luminance.Complexity = scale(Luminance.Complexity),
     Color.Complexity = scale(Color.Complexity),
     Edge.Density = scale(Edge.Density),
-    Asymmetry_of_OA = scale(Asymmetry.of.Object.Arrangement),
+    Asymmetry.of.Object.Arrangement = scale(Asymmetry.of.Object.Arrangement),
     Irregularity.of.Object.Arrangement = scale(Irregularity.of.Object.Arrangement),
     Unique.Objects.Count = scale(Unique.Objects.Count),
     Visual.Variety = scale(Visual.Variety),
     Time = scale(Time),
     Length = scale(Length),
-    logSubscribers = scale(log(subscriberCount + 1)),  # Normalizing after taking log
+    subscriberCount = scale(subscriberCount),  # Normalizing after taking log
     # Ensure DVs are not scaled
     Views = viewCount,  # DV kept in original scale
     Likes = likeCount,  # DV kept in original scale
@@ -100,7 +100,8 @@ norm_data <- norm_data %>%
     squared_Asymmetry_of_OA = Asymmetry.of.Object.Arrangement^2,
     squared_Irregularity_of_OA = Irregularity.of.Object.Arrangement^2,
     squared_Unique_Objects_Count = Unique.Objects.Count^2,
-    squared_Visual_Variety = Visual.Variety^2
+    squared_Visual_Variety = Visual.Variety^2,
+    logSubscribers = log(subscriberCount +1)
   )
 
 #Make formulas for regression
@@ -121,8 +122,8 @@ summary(nb_model_views)
 summary(nb_model_likes)
 summary(nb_model_comments)
 
-log_likelihood <- logLik(nb_model_views)
-bic_value <- BIC(nb_model_views)
+log_likelihood <- logLik(nb_model_comments)
+bic_value <- BIC(nb_model_comments)
 nagelkerke_r2 <- pR2(nb_model_comments)
 print(nagelkerke_r2)
 print(bic_value)
@@ -163,42 +164,94 @@ print(bic_value)
 print(log_likelihood)
 
 #Checking for quadratic relationships
-control_settings <- glm.control(maxit = 300, epsilon = 1e-08, trace = TRUE)  # More conservative settings
+control_settings <- glm.control(maxit = 200, epsilon = 1e-08, trace = TRUE)  # More conservative settings
 
-# Fit Negative Binomial Model for linear functions
+# Fit NB Model for linear and quadratic of Colour Complexity
 CC_nb_model_views <- glm.nb('Views ~ Color.Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
 CC_quad_nb_model_views <- glm.nb('Views ~ Color.Complexity + squared_Color_Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
 CC_nb_model_likes <- glm.nb('Likes ~ Color.Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
 CC_quad_nb_model_likes <- glm.nb('Likes ~ Color.Complexity + squared_Color_Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
-CC_nb_model_comments <- glm.nb('Comments ~ Color.Complexity + logSubscribers + Time + Length + status', norm_data, control = glm.control(maxit = 100))
-CC_quad_nb_model_comments <- glm.nb('Comments ~ Color.Complexity + squared_Color_Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
-?glm.nb
+CC_nb_model_comments <- glm.nb('Comments ~ Color.Complexity + subscriberCount + Time + Length + status', norm_data, control = glm.control(maxit = 100))
+CC_quad_nb_model_comments <- glm.nb('Comments ~ Color.Complexity + squared_Color_Complexity + subscriberCount + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
 summary(CC_nb_model_views)
 summary(CC_quad_nb_model_views)
 summary(CC_nb_model_likes)
 summary(CC_quad_nb_model_likes)
 summary(CC_nb_model_comments)
 summary(CC_quad_nb_model_comments)
-
-CC_nb_model_views <- glm.nb('Views ~ Color.Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
-CC_quad_nb_model_views <- glm.nb('Views ~ Color.Complexity + squared_Color_Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
-CC_nb_model_likes <- glm.nb('Likes ~ Color.Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
-CC_quad_nb_model_likes <- glm.nb('Likes ~ Color.Complexity + squared_Color_Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
-
-CC_nb_model_views <- glm.nb('Views ~ Color.Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
-CC_quad_nb_model_views <- glm.nb('Views ~ Color.Complexity + squared_Color_Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
-CC_nb_model_likes <- glm.nb('Likes ~ Color.Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
-CC_quad_nb_model_likes <- glm.nb('Likes ~ Color.Complexity + squared_Color_Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
-
-
-
-
-
-
+#Quick VIF check
 vif_quad_model_views <- vif(CC_quad_nb_model_views)
 print(vif_quad_model_views)
 
+# Fit NB Model for linear and quadratic of Edge Density
+ED_nb_model_views <- glm.nb('Views ~ Edge.Density + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+ED_quad_nb_model_views <- glm.nb('Views ~ Edge.Density + squared_Edge_Density + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+ED_nb_model_likes <- glm.nb('Likes ~ Edge.Density + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+ED_quad_nb_model_likes <- glm.nb('Likes ~ Edge.Density + squared_Edge_Density + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+ED_nb_model_comments <- glm.nb('Comments ~ Edge.Density + subscriberCount + Time + Length + status', norm_data, control = glm.control(maxit = 100))
+ED_quad_nb_model_comments <- glm.nb('Comments ~ Edge.Density + squared_Edge_Density + subscriberCount + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+summary(ED_nb_model_views)
+summary(ED_quad_nb_model_views)
+summary(ED_nb_model_likes)
+summary(ED_quad_nb_model_likes)
+summary(ED_nb_model_comments)
+summary(ED_quad_nb_model_comments)
 
+# Fit NB Model for linear and quadratic of Lum Entropy
+LE_nb_model_views <- glm.nb('Views ~ Luminance.Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+LE_quad_nb_model_views <- glm.nb('Views ~ Luminance.Complexity + squared_Luminance_Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+LE_nb_model_likes <- glm.nb('Likes ~ Luminance.Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+LE_quad_nb_model_likes <- glm.nb('Likes ~ Luminance.Complexity + squared_Luminance_Complexity + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+LE_nb_model_comments <- glm.nb('Comments ~ Luminance.Complexity + subscriberCount + Time + Length + status', norm_data, control = glm.control(maxit = 100))
+LE_quad_nb_model_comments <- glm.nb('Comments ~ Luminance.Complexity + squared_Luminance_Complexity + subscriberCount + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+summary(LE_nb_model_views)
+summary(LE_quad_nb_model_views)
+summary(LE_nb_model_likes)
+summary(LE_quad_nb_model_likes)
+summary(LE_nb_model_comments)
+summary(LE_quad_nb_model_comments)
+
+# Fit NB Model for linear and quadratic of Irregularity of OA
+IR_nb_model_views <- glm.nb('Views ~ Irregularity.of.Object.Arrangement + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+IR_quad_nb_model_views <- glm.nb('Views ~ Irregularity.of.Object.Arrangement + squared_Irregularity_of_OA + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+IR_nb_model_likes <- glm.nb('Likes ~ Irregularity.of.Object.Arrangement + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+IR_quad_nb_model_likes <- glm.nb('Likes ~ Irregularity.of.Object.Arrangement + squared_Irregularity_of_OA + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+IR_nb_model_comments <- glm.nb('Comments ~ Irregularity.of.Object.Arrangement + subscriberCount + Time + Length + status', norm_data, control = glm.control(maxit = 100))
+IR_quad_nb_model_comments <- glm.nb('Comments ~ Irregularity.of.Object.Arrangement + squared_Irregularity_of_OA + subscriberCount + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+summary(IR_nb_model_views)
+summary(IR_quad_nb_model_views)
+summary(IR_nb_model_likes)
+summary(IR_quad_nb_model_likes)
+summary(IR_nb_model_comments)
+summary(IR_quad_nb_model_comments)
+
+# Fit NB Model for linear and quadratic of Unique Objects
+UO_nb_model_views <- glm.nb('Views ~ Unique.Objects.Count + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+UO_quad_nb_model_views <- glm.nb('Views ~ Unique.Objects.Count + squared_Unique_Objects_Count + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+UO_nb_model_likes <- glm.nb('Likes ~ Unique.Objects.Count + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+UO_quad_nb_model_likes <- glm.nb('Likes ~ Unique.Objects.Count + squared_Unique_Objects_Count + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+UO_nb_model_comments <- glm.nb('Comments ~ Unique.Objects.Count + subscriberCount + Time + Length + status', norm_data, control = glm.control(maxit = 100))
+UO_quad_nb_model_comments <- glm.nb('Comments ~ Unique.Objects.Count + squared_Unique_Objects_Count + subscriberCount + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+summary(UO_nb_model_views)
+summary(UO_quad_nb_model_views)
+summary(UO_nb_model_likes)
+summary(UO_quad_nb_model_likes)
+summary(UO_nb_model_comments)
+summary(UO_quad_nb_model_comments)
+
+# Fit NB Model for Visual Variety
+VV_nb_model_views <- glm.nb('Views ~ Visual.Variety + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+VV_quad_nb_model_views <- glm.nb('Views ~ Visual.Variety + squared_Visual_Variety + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+VV_nb_model_likes <- glm.nb('Likes ~ Visual.Variety + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+VV_quad_nb_model_likes <- glm.nb('Likes ~ Visual.Variety + squared_Visual_Variety + logSubscribers + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+VV_nb_model_comments <- glm.nb('Comments ~ Visual.Variety + subscriberCount + Time + Length + status', norm_data, control = glm.control(maxit = 100))
+VV_quad_nb_model_comments <- glm.nb('Comments ~ Visual.Variety + squared_Visual_Variety + subscriberCount + Time + Length + status', data = norm_data, control = glm.control(maxit = 100))
+summary(VV_nb_model_views)
+summary(VV_quad_nb_model_views)
+summary(VV_nb_model_likes)
+summary(VV_quad_nb_model_likes)
+summary(VV_nb_model_comments)
+summary(VV_quad_nb_model_comments)
 
 
 
@@ -235,3 +288,4 @@ if(interactive()) View(cor_matrix_formatted)
 
 # Save your correlation matrix to a CSV file
 write.csv(cor_matrix_formatted, "Data/correlation_matrix.csv", row.names = TRUE)
+
