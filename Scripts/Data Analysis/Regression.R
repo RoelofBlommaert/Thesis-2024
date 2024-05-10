@@ -63,6 +63,8 @@ summary(nb_model_views)
 summary(nb_model_likes)
 summary(nb_model_comments)
 
+
+
 # Calculate VIF for each of the models to check for multicollinearity
 vif_model_views <- vif(nb_model_views)
 vif_model_likes <- vif(poisson_model_likes)
@@ -105,14 +107,22 @@ norm_data <- norm_data %>%
   )
 
 #Make formulas for regression
-views_formula <- 'Views ~ Color.Complexity + Edge.Density + Luminance.Complexity +
-Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
+views_formula <- 'Views ~ Color.Complexity + Edge.Density + Luminance.Complexity + Asymmetry.of.Object.Arrangement +
+Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + subscriberCount + Time + Length + status'
 
-likes_formula <- 'Likes ~ Color.Complexity + Edge.Density + Luminance.Complexity +
-Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
+likes_formula <- 'Likes ~ Color.Complexity + Edge.Density + Luminance.Complexity + Asymmetry.of.Object.Arrangement +
+Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + subscriberCount + Time + Length + status'
 
-comments_formula <- 'Comments ~ Color.Complexity + Edge.Density + Luminance.Complexity +
-Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
+comments_formula <- 'Comments ~ Color.Complexity + Edge.Density + Luminance.Complexity + Asymmetry.of.Object.Arrangement +
+Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + subscriberCount + Time + Length + status'
+
+# Fit Poisson Model for Views as a baseline
+poisson_model_views <- glm(views_formula, family = poisson, data = norm_data)
+poisson_model_likes <- glm(likes_formula, family = poisson, data = norm_data)
+poisson_model_comments <- glm(comments_formula, family = poisson, data = norm_data)
+summary(poisson_model_views)
+summary(poisson_model_likes)
+summary(poisson_model_comments)
 
 # Fit Negative Binomial Model for linear functions
 nb_model_views <- glm.nb(views_formula, data = norm_data, control = glm.control(maxit = 100))
@@ -121,6 +131,9 @@ nb_model_comments <- glm.nb(comments_formula, data = norm_data, control = glm.co
 summary(nb_model_views)
 summary(nb_model_likes)
 summary(nb_model_comments)
+
+#Perform LRT
+pchisq(2 * (logLik(nb_model_likes) - logLik(poisson_model_likes)), df = 1, lower.tail = FALSE)
 
 log_likelihood <- logLik(nb_model_comments)
 bic_value <- BIC(nb_model_comments)
@@ -253,8 +266,10 @@ summary(VV_quad_nb_model_likes)
 summary(VV_nb_model_comments)
 summary(VV_quad_nb_model_comments)
 
-
-
+lrt_result <- anova(VV_nb_model_comments, nb_model_comments, test = "Chisq")
+print(lrt_result)
+max_value <- min(norm_data$Irregularity.of.Object.Arrangement, na.rm = TRUE)
+print(max_value)
 # Select only the continuous variables you're interested in
 model_data['Subscribers'] <- exp(model_data['logSubscribers'])
 data_for_correlation <- model_data[, c("Views", "Likes", "Comments", "Luminance.Complexity", "Color.Complexity", "Edge.Density","Asymmetry.of.Object.Arrangement" ,"Irregularity.of.Object.Arrangement", "Unique.Objects.Count", "Visual.Variety", "Subscribers", "Time", "Length", "status")]
