@@ -8,6 +8,7 @@ if (!require(car)) {
   library(car)
 }
 library(pscl)
+library(ggplot2)
 
 
 setwd("/Users/roelofblommaert/Thesis-2024/Thesis-2024")
@@ -142,40 +143,6 @@ print(nagelkerke_r2)
 print(bic_value)
 print(log_likelihood)
 
-
-#Conducting PCA to deal with multicoll
-pca_results <- prcomp(norm_data[, c("Asymmetry.of.Object.Arrangement", "Irregularity.of.Object.Arrangement")], center = TRUE, scale. = TRUE)
-
-# Extracting the first principal component
-norm_data$PCA1 <- pca_results$x[, 1]
-
-# Optional: View summary of PCA to see variance explained
-print(summary(pca_results))
-print(pca_results$rotation)
-
-norm_data$squared_PCA1 <- norm_data$PCA1^2
-
-
-#Make formulas for regression
-pca_views_formula <- 'Views ~ Color.Complexity + Edge.Density + Luminance.Complexity + PCA1 + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
-pca_likes_formula <- 'Likes ~ Color.Complexity + Edge.Density + Luminance.Complexity + PCA1 + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
-pca_comment_formula <- 'Comments ~ Color.Complexity + Edge.Density + Luminance.Complexity + PCA1 + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
-
-# Fit Negative Binomial Model for linear functions with PCA
-nb_model_views <- glm.nb(pca_views_formula, data = norm_data, control = glm.control(maxit = 100))
-nb_model_likes <- glm.nb(pca_likes_formula, data = norm_data, control = glm.control(maxit = 100))
-nb_model_comments <- glm.nb(pca_comment_formula, data = norm_data, control = glm.control(maxit = 100))
-summary(nb_model_views)
-summary(nb_model_likes)
-summary(nb_model_comments)
-
-log_likelihood <- logLik(nb_model_views)
-bic_value <- BIC(nb_model_views)
-nagelkerke_r2 <- pR2(nb_model_views)
-print(nagelkerke_r2)
-print(bic_value)
-print(log_likelihood)
-
 #Checking for quadratic relationships
 control_settings <- glm.control(maxit = 200, epsilon = 1e-08, trace = TRUE)  # More conservative settings
 
@@ -270,6 +237,148 @@ lrt_result <- anova(VV_nb_model_comments, nb_model_comments, test = "Chisq")
 print(lrt_result)
 max_value <- min(norm_data$Irregularity.of.Object.Arrangement, na.rm = TRUE)
 print(max_value)
+
+
+
+# Function to apply min-max normalization
+min_max_normalize <- function(x) {
+  return((x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE)))
+}
+
+# Create a new data frame for min-max normalization
+mm_data <- data
+
+# Define the variable names for independent and control variables
+iv_list <- c("Color.Complexity", "Edge.Density", "Luminance.Complexity", "Irregularity.of.Object.Arrangement", "Unique.Objects.Count", "Visual.Variety")
+control_vars <- c("logSubscribers", "Time", "Length", "subscriberCount")
+
+# Apply min-max normalization to each independent and control variable
+for (iv in iv_list) {
+  mm_data[[iv]] <- min_max_normalize(mm_data[[iv]])
+  mm_data[[paste0("squared_", iv)]] <- mm_data[[iv]]^2
+}
+
+for (control in control_vars) {
+  if (control %in% names(mm_data)) {
+    mm_data[[control]] <- min_max_normalize(mm_data[[control]])
+  }
+}
+
+# Re-fit NB models with min-max normalized data
+CC_quad_nb_model_views <- glm.nb(viewCount ~ Color.Complexity + squared_Color.Complexity + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+CC_quad_nb_model_likes <- glm.nb(likeCount ~ Color.Complexity + squared_Color.Complexity + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+CC_quad_nb_model_comments <- glm.nb(commentCount ~ Color.Complexity + squared_Color.Complexity + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+
+ED_quad_nb_model_views <- glm.nb(viewCount ~ Edge.Density + squared_Edge.Density + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+ED_quad_nb_model_likes <- glm.nb(likeCount ~ Edge.Density + squared_Edge.Density + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+ED_quad_nb_model_comments <- glm.nb(commentCount ~ Edge.Density + squared_Edge.Density + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+
+LE_quad_nb_model_views <- glm.nb(viewCount ~ Luminance.Complexity + squared_Luminance.Complexity + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+LE_quad_nb_model_likes <- glm.nb(likeCount ~ Luminance.Complexity + squared_Luminance.Complexity + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+LE_quad_nb_model_comments <- glm.nb(commentCount ~ Luminance.Complexity + squared_Luminance.Complexity + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+
+IR_quad_nb_model_views <- glm.nb(viewCount ~ Irregularity.of.Object.Arrangement + squared_Irregularity.of.Object.Arrangement + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+IR_quad_nb_model_likes <- glm.nb(likeCount ~ Irregularity.of.Object.Arrangement + squared_Irregularity.of.Object.Arrangement + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+IR_quad_nb_model_comments <- glm.nb(commentCount ~ Irregularity.of.Object.Arrangement + squared_Irregularity.of.Object.Arrangement + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+
+UO_quad_nb_model_views <- glm.nb(viewCount ~ Unique.Objects.Count + squared_Unique.Objects.Count + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+UO_quad_nb_model_likes <- glm.nb(likeCount ~ Unique.Objects.Count + squared_Unique.Objects.Count + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+UO_quad_nb_model_comments <- glm.nb(commentCount ~ Unique.Objects.Count + squared_Unique.Objects.Count + subscriberCount + Time + Length + status, data = mm_data, control = glm.control(maxit = 100))
+
+# Function to create scatter plots with quadratic smoothers and percentile marks
+plot_quad_relationship <- function(data, iv, dv, title) {
+  # Calculate the 25th, 50th, and 75th percentiles for the independent variable
+  percentiles <- quantile(data[[iv]], probs = c(0.01, 0.25, 0.50, 0.75, 0.99), na.rm = TRUE)
+  
+  # Calculate the y-values on the smooth line at the percentile positions
+  gg <- ggplot(data, aes_string(x = iv, y = dv)) +
+    geom_smooth(method = "lm", formula = y ~ poly(x, 2), color = "black", se = FALSE)
+  smooth_data <- ggplot_build(gg)$data[[1]]
+  
+  # Find the y values at the percentiles
+  y_values <- sapply(percentiles, function(p) {
+    smooth_data$y[which.min(abs(smooth_data$x - p))]
+  })
+  
+  gg + geom_point(aes(x = percentiles[1], y = y_values[1]), color = "black", size = 2, shape = 21, fill = "white") +
+    geom_point(aes(x = percentiles[2], y = y_values[2]), color = "black", size = 2, shape = 21, fill = "white") +
+    geom_point(aes(x = percentiles[3], y = y_values[3]), color = "black", size = 2, shape = 21, fill = "white") +
+    geom_point(aes(x = percentiles[4], y = y_values[4]), color = "black", size = 2, shape = 21, fill = "white") +
+    geom_point(aes(x = percentiles[5], y = y_values[5]), color = "black", size = 2, shape = 21, fill = "white") +
+    labs(title = title) +
+    theme_minimal() +
+    theme(axis.text.y = element_blank(), axis.title = element_blank(), panel.grid = element_blank(), axis.line = element_line(color = "black"))
+}
+
+# Define the dependent variables
+dv_list <- c("viewCount", "likeCount", "commentCount")
+
+# Create plots for each combination of independent and dependent variables
+for (iv in iv_list) {
+  for (dv in dv_list) {
+    # Create a title for the plot
+    title <- paste(dv, "vs", iv, "(Quadratic)")
+    
+    # Generate and display the plot
+    print(plot_quad_relationship(mm_data, iv, dv, title))
+  }
+}
+
+
+
+
+
+# Define a function to create scatter plots with quadratic smoothers
+plot_quad_relationship <- function(data, iv, dv, title) {
+  ggplot(data, aes_string(x = iv, y = dv)) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "lm", formula = y ~ poly(x, 2), color = "blue", se = FALSE) +
+    labs(title = title, x = iv, y = dv) +
+    theme_minimal()
+}
+
+# Define the variable names
+iv_list <- c("Color.Complexity", "Edge.Density", "Luminance.Complexity", "Irregularity.of.Object.Arrangement", "Unique.Objects.Count", "Visual.Variety")
+dv_list <- c("Views", "Likes", "Comments")
+
+# Create plots for each combination of independent and dependent variables
+for (iv in iv_list) {
+  for (dv in dv_list) {
+    # Create a title for the plot
+    title <- paste(dv, "vs", iv, "(Quadratic)")
+    
+    # Generate and display the plot
+    print(plot_quad_relationship(norm_data, iv, dv, title))
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Select only the continuous variables you're interested in
 model_data['Subscribers'] <- exp(model_data['logSubscribers'])
 data_for_correlation <- model_data[, c("Views", "Likes", "Comments", "Luminance.Complexity", "Color.Complexity", "Edge.Density","Asymmetry.of.Object.Arrangement" ,"Irregularity.of.Object.Arrangement", "Unique.Objects.Count", "Visual.Variety", "Subscribers", "Time", "Length", "status")]
