@@ -9,6 +9,7 @@ if (!require(car)) {
 }
 library(pscl)
 library(ggplot2)
+library(broom)
 
 
 setwd("/Users/roelofblommaert/Thesis-2024/Thesis-2024")
@@ -37,7 +38,7 @@ model_data <- data %>%
 
 # Print the data to check it
 print(head(model_data))
-
+describe(model_data)
 #Make formulas for regression
 views_formula <- 'Views ~ Color.Complexity + Edge.Density + Luminance.Complexity + Asymmetry.of.Object.Arrangement +
 Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
@@ -63,7 +64,6 @@ nb_model_comments <- glm.nb(comments_formula, data = model_data, control = glm.c
 summary(nb_model_views)
 summary(nb_model_likes)
 summary(nb_model_comments)
-
 
 
 # Calculate VIF for each of the models to check for multicollinearity
@@ -239,6 +239,171 @@ max_value <- min(norm_data$Irregularity.of.Object.Arrangement, na.rm = TRUE)
 print(max_value)
 
 
+# Summary of the model
+summary(quadratic_model)
+
+# Extract slopes of Irregularity of OA
+coefficients <- summary(IR_quad_nb_model_views)$coefficients
+beta_1 <- coefficients["Irregularity.of.Object.Arrangement", "Estimate"]
+beta_2 <- coefficients["squared_Irregularity_of_OA", "Estimate"]
+
+# Define the range of the independent variable
+x_min <- min(norm_data$Irregularity.of.Object.Arrangement, na.rm = TRUE)
+x_max <- max(norm_data$Irregularity.of.Object.Arrangement, na.rm = TRUE)
+
+# Calculate the slopes at the minimum and maximum values of the independent variable
+slope_min <- beta_1 + 2 * beta_2 * x_min
+slope_max <- beta_1 + 2 * beta_2 * x_max
+
+# Function to calculate standard error of the slope
+calculate_slope_se <- function(x, model, beta_1, beta_2) {
+  vcov_matrix <- vcov(model)
+  se_slope <- sqrt(vcov_matrix["Irregularity.of.Object.Arrangement", "Irregularity.of.Object.Arrangement"] + 
+                     (4 * x^2) * vcov_matrix["squared_Irregularity_of_OA", "squared_Irregularity_of_OA"] + 
+                     (4 * x) * vcov_matrix["Irregularity.of.Object.Arrangement", "squared_Irregularity_of_OA"])
+  return(se_slope)
+}
+
+# Calculate standard errors
+se_slope_min <- calculate_slope_se(x_min, IR_quad_nb_model_views, beta_1, beta_2)
+se_slope_max <- calculate_slope_se(x_max, IR_quad_nb_model_views, beta_1, beta_2)
+
+# Calculate t-values and p-values for the slopes
+t_slope_min <- slope_min / se_slope_min
+t_slope_max <- slope_max / se_slope_max
+
+p_slope_min <- 2 * pt(abs(t_slope_min), df = df.residual(IR_quad_nb_model_views), lower.tail = FALSE)
+p_slope_max <- 2 * pt(abs(t_slope_max), df = df.residual(IR_quad_nb_model_views), lower.tail = FALSE)
+
+# Print the slopes and their significance
+cat("Slope at x_min (", x_min, "): ", slope_min, "p-value: ", p_slope_min, "\n")
+cat("Slope at x_max (", x_max, "): ", slope_max, "p-value: ", p_slope_max, "\n")
+
+
+# Extract slopes of Colour Complexity ~ Comments
+coefficients <- summary(CC_quad_nb_model_comments)$coefficients
+beta_1 <- coefficients["Color.Complexity", "Estimate"]
+beta_2 <- coefficients["squared_Color_Complexity", "Estimate"]
+
+# Define the range of the independent variable
+x_min <- min(norm_data$Color.Complexity, na.rm = TRUE)
+x_max <- max(norm_data$Color.Complexity, na.rm = TRUE)
+
+# Calculate the slopes at the minimum and maximum values of the independent variable
+slope_min <- beta_1 + 2 * beta_2 * x_min
+slope_max <- beta_1 + 2 * beta_2 * x_max
+
+# Function to calculate standard error of the slope
+calculate_slope_se <- function(x, model, beta_1, beta_2) {
+  vcov_matrix <- vcov(model)
+  se_slope <- sqrt(vcov_matrix["Color.Complexity", "Color.Complexity"] + 
+                     (4 * x^2) * vcov_matrix["squared_Color_Complexity", "squared_Color_Complexity"] + 
+                     (4 * x) * vcov_matrix["Color.Complexity", "squared_Color_Complexity"])
+  return(se_slope)
+}
+
+# Calculate standard errors
+se_slope_min <- calculate_slope_se(x_min, CC_quad_nb_model_comments, beta_1, beta_2)
+se_slope_max <- calculate_slope_se(x_max, CC_quad_nb_model_comments, beta_1, beta_2)
+
+# Calculate t-values and p-values for the slopes
+t_slope_min <- slope_min / se_slope_min
+t_slope_max <- slope_max / se_slope_max
+
+p_slope_min <- 2 * pt(abs(t_slope_min), df = df.residual(CC_quad_nb_model_comments), lower.tail = FALSE)
+p_slope_max <- 2 * pt(abs(t_slope_max), df = df.residual(CC_quad_nb_model_comments), lower.tail = FALSE)
+
+# Print the slopes and their significance
+cat("Slope at x_min (", x_min, "): ", slope_min, "p-value: ", p_slope_min, "\n")
+cat("Slope at x_max (", x_max, "): ", slope_max, "p-value: ", p_slope_max, "\n")
+
+
+
+# Function to calculate the turning point and its 95% confidence interval
+calculate_turning_point_ci <- function(model, iv, squared_iv) {
+  # Extract coefficients
+  coef_summary <- summary(model)$coefficients
+  beta_1 <- coef_summary[iv, "Estimate"]
+  beta_2 <- coef_summary[squared_iv, "Estimate"]
+  
+  # Calculate the turning point
+  turning_point <- -beta_1 / (2 * beta_2)
+  
+  # Calculate the standard error and confidence interval using deltaMethod
+  delta_expr <- paste0("-(", iv, ") / (2 * ", squared_iv, ")")
+  delta_result <- deltaMethod(model, delta_expr)
+  
+  # Extract the confidence interval from delta_result
+  ci_lower <- delta_result$`2.5 %`
+  ci_upper <- delta_result$`97.5 %`
+  
+  # Return the results
+  list(turning_point = turning_point, ci_lower = ci_lower, ci_upper = ci_upper)
+}
+
+# Define the list of models with named elements
+models <- list(
+  CC_quad_nb_model_views = CC_quad_nb_model_views,
+  CC_quad_nb_model_likes = CC_quad_nb_model_likes,
+  CC_quad_nb_model_comments = CC_quad_nb_model_comments,
+  ED_quad_nb_model_views = ED_quad_nb_model_views,
+  ED_quad_nb_model_likes = ED_quad_nb_model_likes,
+  ED_quad_nb_model_comments = ED_quad_nb_model_comments,
+  LE_quad_nb_model_views = LE_quad_nb_model_views,
+  LE_quad_nb_model_likes = LE_quad_nb_model_likes,
+  LE_quad_nb_model_comments = LE_quad_nb_model_comments,
+  IR_quad_nb_model_views = IR_quad_nb_model_views,
+  IR_quad_nb_model_likes = IR_quad_nb_model_likes,
+  IR_quad_nb_model_comments = IR_quad_nb_model_comments,
+  UO_quad_nb_model_views = UO_quad_nb_model_views,
+  UO_quad_nb_model_likes = UO_quad_nb_model_likes,
+  UO_quad_nb_model_comments = UO_quad_nb_model_comments,
+  VV_quad_nb_model_views = VV_quad_nb_model_views,
+  VV_quad_nb_model_likes = VV_quad_nb_model_likes,
+  VV_quad_nb_model_comments = VV_quad_nb_model_comments
+)
+
+# Define the list of independent variables and their squared counterparts
+ivs <- c("Color.Complexity", "Edge.Density", "Luminance.Complexity", "Irregularity.of.Object.Arrangement", "Unique.Objects.Count", "Visual.Variety")
+squared_ivs <- c("squared_Color_Complexity", "squared_Edge_Density", "squared_Luminance_Complexity", "squared_Irregularity_of_OA", "squared_Unique_Objects_Count", "squared_Visual_Variety")
+
+
+# Function to apply the calculation to all models
+apply_calculations <- function(models, ivs, squared_ivs) {
+  results <- list()
+  
+  for (i in seq_along(ivs)) {
+    iv <- ivs[i]
+    squared_iv <- squared_ivs[i]
+    
+    for (model_name in names(models)) {
+      model <- models[[model_name]]
+      
+      # Debug print to check the coefficients
+      print(paste("Model:", model_name))
+      print(paste("IV:", iv))
+      print(paste("Squared IV:", squared_iv))
+      print(names(coef(model)))
+      
+      if (iv %in% names(coef(model)) && squared_iv %in% names(coef(model))) {
+        result <- calculate_turning_point_ci(model, iv, squared_iv)
+        results[[paste(model_name, iv, sep = "_")]] <- result
+      }
+    }
+  }
+  
+  return(results)
+}
+
+# Apply the function to all models and independent variables
+results <- apply_calculations(models, ivs, squared_ivs)
+
+# Print the results
+results
+
+
+
+
 
 # Function to apply min-max normalization
 min_max_normalize <- function(x) {
@@ -323,58 +488,6 @@ for (iv in iv_list) {
     print(plot_quad_relationship(mm_data, iv, dv, title))
   }
 }
-
-
-
-
-
-# Define a function to create scatter plots with quadratic smoothers
-plot_quad_relationship <- function(data, iv, dv, title) {
-  ggplot(data, aes_string(x = iv, y = dv)) +
-    geom_point(alpha = 0.5) +
-    geom_smooth(method = "lm", formula = y ~ poly(x, 2), color = "blue", se = FALSE) +
-    labs(title = title, x = iv, y = dv) +
-    theme_minimal()
-}
-
-# Define the variable names
-iv_list <- c("Color.Complexity", "Edge.Density", "Luminance.Complexity", "Irregularity.of.Object.Arrangement", "Unique.Objects.Count", "Visual.Variety")
-dv_list <- c("Views", "Likes", "Comments")
-
-# Create plots for each combination of independent and dependent variables
-for (iv in iv_list) {
-  for (dv in dv_list) {
-    # Create a title for the plot
-    title <- paste(dv, "vs", iv, "(Quadratic)")
-    
-    # Generate and display the plot
-    print(plot_quad_relationship(norm_data, iv, dv, title))
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
