@@ -16,7 +16,7 @@ setwd("/Users/roelofblommaert/Thesis-2024/Thesis-2024")
 # Assuming your data is read from a CSV or similar
 data <- read.csv("Data/feature_matrix.csv")
 
-# Create squared and interaction terms, and transform data as needed
+# Create squared terms, and transform data as needed
 model_data <- data %>%
   mutate(
     squared_Luminance_Complexity = `Luminance.Complexity`^2,
@@ -107,7 +107,7 @@ norm_data <- norm_data %>%
     logSubscribers = log(subscriberCount +1)
   )
 
-#Make formulas for regression
+#Make formulas for model comparison
 views_formula <- 'Views ~ Color.Complexity + Edge.Density + Luminance.Complexity + Asymmetry.of.Object.Arrangement +
 Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + subscriberCount + Time + Length + status'
 
@@ -139,6 +139,58 @@ pchisq(2 * (logLik(nb_model_likes) - logLik(poisson_model_likes)), df = 1, lower
 log_likelihood <- logLik(nb_model_comments)
 bic_value <- BIC(nb_model_comments)
 nagelkerke_r2 <- pR2(nb_model_comments)
+print(nagelkerke_r2)
+print(bic_value)
+print(log_likelihood)
+
+#Make formulas for full model interpretation
+views_formula <- 'Views ~ Color.Complexity + Edge.Density + Luminance.Complexity +
+Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
+
+likes_formula <- 'Likes ~ Color.Complexity + Edge.Density + Luminance.Complexity +
+Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
+
+comments_formula <- 'Comments ~ Color.Complexity + Edge.Density + Luminance.Complexity +
+Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety + logSubscribers + Time + Length + status'
+
+
+# Fit Negative Binomial Model for full model interpretation
+nb_model_views <- glm.nb(views_formula, data = norm_data, control = glm.control(maxit = 100))
+nb_model_likes <- glm.nb(likes_formula, data = norm_data, control = glm.control(maxit = 100))
+nb_model_comments <- glm.nb(comments_formula, data = norm_data, control = glm.control(maxit = 100))
+summary(nb_model_views)
+summary(nb_model_likes)
+summary(nb_model_comments)
+
+log_likelihood <- logLik(nb_model_comments)
+bic_value <- BIC(nb_model_comments)
+nagelkerke_r2 <- pR2(nb_model_comments)
+print(nagelkerke_r2)
+print(bic_value)
+print(log_likelihood)
+
+#Make formulas for full model interpretation
+views_formula <- 'Views ~ Color.Complexity + Edge.Density + Luminance.Complexity +
+Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety'
+
+likes_formula <- 'Likes ~ Color.Complexity + Edge.Density + Luminance.Complexity +
+Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety'
+
+comments_formula <- 'Comments ~ Color.Complexity + Edge.Density + Luminance.Complexity +
+Irregularity.of.Object.Arrangement + Unique.Objects.Count + Visual.Variety'
+
+control_settings <- glm.control(maxit = 500, epsilon = 1e-10, trace = TRUE)  # More conservative settings
+# Fit Negative Binomial Model without controls
+nb_model_views <- glm.nb(views_formula, data = norm_data, init.theta = 0.3, control = control_settings)
+nb_model_likes <- glm.nb(likes_formula, data = norm_data, init.theta = 0.67, control = control_settings)
+nb_model_comments <- glm.nb(comments_formula, data = norm_data, init.theta = 0.5,,control = control_settings)
+summary(nb_model_views)
+summary(nb_model_likes)
+summary(nb_model_comments)
+
+log_likelihood <- logLik(nb_model_likes)
+bic_value <- BIC(nb_model_likes)
+nagelkerke_r2 <- pR2(nb_model_likes)
 print(nagelkerke_r2)
 print(bic_value)
 print(log_likelihood)
