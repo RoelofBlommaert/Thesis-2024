@@ -50,7 +50,7 @@ The data folder contains modularised .csv files of the output of most scripts, s
 
 Finally, the data also contains some frames or plots for visualisation in the paper. 
 
-## For reference, the following papers are used for calculations, or constructs:
+## The following papers are used for calculations, or constructs:
 
 Hasler, D., & Süsstrunk, S. (2003). Measuring colorfulness in natural images. Proceedings of SPIE.
 https://doi.org/10.1117/12.477378
@@ -63,7 +63,7 @@ Rosenholtz, R., Li, Y., & Nakano, L. (2007a). Measuring visual clutter. Journal 
 
 Walthers, D., & Koch, C. (2006). Modeling attention to salient proto-objects. Neural Networks, 19(9), 1395–1407. https://doi.org/10.1016/j.neunet.2006.10.001
 
-## And the following code or modules used in this repository:
+## The following code or modules used in this repository:
 Overgoor. (2022). IJRM_Visual_complexity. GitHub. Retrieved March 12, 2024, from https://github.com/Gyys1992/IJRM_visual_complexity
 
 Rosenholtz, R., Li, Y., & Nakano, L. (2007b). Feature Congestion and Subband Entropy measures of visual clutter. MIT Libraries DSpace. Retrieved March 26, 2024, from http://hdl.handle.net/1721.1/37593
