@@ -10,7 +10,7 @@ The files in this repository are split up into four folders:
 1. Data
 2. Scripts
 3. Helper functions
-4. The repository used by ​‌‌‍‍​‍Overgoor, G., Rand, W., Van Dolen, W., & Mazloom, M. (2022). Simplicity is not key: understanding firm-generated social media images and consumer liking. International Journal of Research in Marketing, 39(3), 639–655. https://doi.org/10.1016/j.ijresmar.2021.12.005
+4. The repository used by ​‌‌‍‍​‍Overgoor (2022)
 
 
 The scripts and data folders have the following contents
