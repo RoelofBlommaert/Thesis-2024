@@ -52,6 +52,9 @@ Finally, the data also contains some frames or plots for visualisation in the pa
 
 ## For reference, the following papers are used for calculations, or constructs:
 
+Hasler, D., & Süsstrunk, S. (2003). Measuring colorfulness in natural images. Proceedings of SPIE.
+https://doi.org/10.1117/12.477378
+
 Li, X., Shi, M., & Wang, X. (2019). Video mining: Measuring visual information using automatic methods. International Journal of Research in Marketing, 36(2), 216–231. https://doi.org/10.1016/j.ijresmar.2019.02.004
 
 ​‌‌‍‍​‍Overgoor, G., Rand, W., Van Dolen, W., & Mazloom, M. (2022). Simplicity is not key: understanding firm-generated social media images and consumer liking. International Journal of Research in Marketing, 39(3), 639–655. https://doi.org/10.1016/j.ijresmar.2021.12.005
