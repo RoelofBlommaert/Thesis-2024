@@ -29,7 +29,7 @@ The scripts and data folders have the following contents
 
 2. [Detectron object counting.py](https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Scripts/Video%20Analytics/Detectron%20object%20counting.py) is a file that calls the `Detectron object counting.py` file, individually loops through the videos and saves the unique labels of objects detected and the unique object count. This file loops through the videos individually since the dependencies and computational power necessary for the detectron2 package can cause errors frequently. Isolating the package in one file makes this more manageable.
 
-3. Despite [Visual_complexity_main.m] (https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Visual_complexity_main.m) being in main, it is part of the video analysis procedure, which calculates the measures outlined in Overgoor et al. (2022) for video analysis, and also used the Helper functions/Saliency Toolbox by Rosenholtz et al. (2007).
+3. Despite [Visual_complexity_main.m] (https://github.com/RoelofBlommaert/Thesis-2024/blob/main/Visual_complexity_main.m) being in main, it is part of the video analysis procedure, which calculates the measures outlined in Overgoor et al. (2022) for video analysis, used the Helper functions by Rosenholtz et al. (2007), and handled the Saliency Toolbox by Walthers and Koch (2007).
 
 
 ## c. Data exploration
@@ -46,5 +46,20 @@ Other files in this folder are for generating example visuals in the paper.
 
 The data folder contains modularised .csv files of the output of most scripts, such as the outcome of object counting, the outcome of the video analysis scripts in Python, the outcome of the visual analysis in Matlab, and a combined visual features file. It also contains the links to the raw video links, the result of the channel and video GET requests, and a combined raw feature matrix, and the cleaned and recalculated variants.
 
+#In this repo, code and constructs are used by
+
 Finally, the data also contains some frames or plots for visualisation in the paper. 
+
+##For reference, the following papers are used for calculations, or constructs:
+
+Li, X., Shi, M., & Wang, X. (2019). Video mining: Measuring visual information using automatic methods. International Journal of Research in Marketing, 36(2), 216–231. https://doi.org/10.1016/j.ijresmar.2019.02.004
+​‌‌‍‍​‍Overgoor, G., Rand, W., Van Dolen, W., & Mazloom, M. (2022). Simplicity is not key: understanding firm-generated social media images and consumer liking. International Journal of Research in Marketing, 39(3), 639–655. https://doi.org/10.1016/j.ijresmar.2021.12.005
+Rosenholtz, R., Li, Y., & Nakano, L. (2007a). Measuring visual clutter. Journal of Vision, 7(2), 17. https://doi.org/10.1167/7.2.17
+Walthers, D., & Koch, C. (2006). Modeling attention to salient proto-objects. Neural Networks, 19(9), 1395–1407. https://doi.org/10.1016/j.neunet.2006.10.001
+
+##And the following code or modules used in this repository:
+Overgoor. (2022). IJRM_Visual_complexity. GitHub. Retrieved March 12, 2024, from https://github.com/Gyys1992/IJRM_visual_complexity
+Rosenholtz, R., Li, Y., & Nakano, L. (2007b). Feature Congestion and Subband Entropy measures of visual clutter. MIT Libraries DSpace. Retrieved March 26, 2024, from http://hdl.handle.net/1721.1/37593
+Walthers, D., & Koch, C. (2007). SaliencyToolbox. GitHub. Retrieved March 26, 2024, from https://github.com/DirkBWalther/SaliencyToolbox
+Wu, Y., Kirillov, A., Massa, F., Lo, W.-Y., & Girshick, R. (2019). Detectron2. Retrieved April 2, 2024, from https://github.com/facebookresearch/detectron2
 
