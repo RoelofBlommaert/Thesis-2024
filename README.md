@@ -1,4 +1,4 @@
-# The Search for Engaging Ads: A Visual Feature Analysis of Video Advertisements Leveraging Computer Vision
+# Crafting Engaging Ads: A Visual Feature Analysis of Video Advertisements Leveraging Computer Vision
 
 Hi there! 😄
 
